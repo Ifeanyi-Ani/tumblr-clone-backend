@@ -2,6 +2,7 @@ const express = require('express');
 const App = express();
 const path = require('path');
 const dotenv = require('dotenv');
+
 const helmet = require('helmet');
 const morgan = require('morgan');
 
@@ -9,7 +10,8 @@ const globalErr = require('./controllers/errController')
 const AppErr = require('./utils/appErr')
 const userRoute = require('./routes/users')
 const authRoute = require('./routes/auth')
-
+const postRoute = require('./routes/post')
+dotenv.config()
 
 App.use(express.json());
 App.use(helmet());
@@ -25,6 +27,7 @@ App.use((req, res, next) => {
 
 App.use('/users', userRoute)
 App.use('/auth', authRoute)
+App.use('/posts', postRoute)
 
 App.all('*', (req, res, next) => {
 

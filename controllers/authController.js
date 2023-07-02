@@ -1,11 +1,13 @@
+const { promisify } = require('util')
 const jwt = require("jsonwebtoken");
 const User = require("./../models/User");
 const bcrypt = require('bcrypt');
 const catchAsync = require('../utils/catchAsync')
+const AppErr = require("../utils/appErr")
 
 const signToken = (id) => {
-  return jwt.sign({ id }, "process.env.JWT_SECRET", {
-    expiresIn: "10m"
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES
   });
 }
 exports.signup = catchAsync(async (req, res, next) => {
@@ -14,12 +16,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   // const salt = await bcrypt.genSalt(10);
   // const hashPwd = await bcrypt.hash(req.body.password, salt)
 
-  const newUser = new User({
-    full_name: req.body.full_name,
-    email: req.body.email,
-    password: req.body.password
-    // password: hashPwd
-  })
+  const newUser = new User(req.body)
 
   const token = signToken(newUser._id)
 
@@ -36,17 +33,13 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
 
-  const { full_name, email, password } = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(400).json({
-      status: "failed",
-      msg: "Incorrect login details"
-    })
-    return
+    next(new AppErr('Please provide email and password'), 400)
   }
   const user = await User.findOne({ email }).select("+password");
-  console.log(await user.correctPassword(password, user.password));
+  // console.log(await user.correctPassword(password, user.password));
 
   if (!user || !await user.correctPassword(password, user.password)) {
     return res.status(401).json({
@@ -72,24 +65,47 @@ exports.login = catchAsync(async (req, res, next) => {
   // }
 })
 
-// exports.protect = async (req, res, next) => {
-//   let token
-//   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-//     token = req.headers.authorization.split(" ")[1]
-//   }
-//   console.log(token)
+exports.protect = catchAsync(async (req, res, next) => {
+  let token
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1]
+  }
 
-//   if (!token) {
-//     res.status(401).json({
-//       status: "unauthorized",
-//     })
-//   }
-//   next()
-// }
 
-// exports.restrictTo = (admin) => {
-//   return (req, res, next) => {
-//     // if (!admin)
-//     next()
+  if (!token) {
+    return next(new AppErr('You are not logged in! Please log in to get access', 401))
+  }
+  console.log(process.env.JWT_SECRET);
+
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+
+  const currentUser = await User.findById(decoded.id)
+  if (!currentUser) {
+    return next(new AppErr('The user belonging to the token does no longer exists', 401))
+  }
+
+  req.user = currentUser
+  next()
+})
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+
+    if (!roles.includes(req.user.role)) {
+      return next(new AppErr('You do not have permission to perform this action', 403))
+    }
+    next()
+  }
+}
+// exports.forgotPassword = catchAsync(async (req, res, next) => {
+//   const user = await User.findOne({ email: req.body.email })
+//   if (!user) {
+//     return next(new AppErr('There is no user with email address.', 404))
 //   }
-// }
+//   const resetToken = user.createPasswordResetToken()
+//   await user.save({ validateBeforeSave: false })
+
+// })
+// exports.resetPassword = catchAsync(async (req, res, next) => {
+
+// })

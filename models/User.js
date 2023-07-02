@@ -1,49 +1,79 @@
+const crypto = require('crypto')
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
-// const validator=require("validator")
+const validator = require("validator");
+const { default: isEmail } = require('validator/lib/isEmail');
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: [true, "Provide your username"],
     min: 3,
     max: 50,
-    unique: [true, "username already exist"]
+    unique: true,
   },
   email: {
     type: String,
     required: [true, "Provide your email"],
     unique: true,
-    lowercase: true
+    lowercase: true,
+    validate: [validator.isEmail, "Please provide a valid email"]
   },
   password: {
     type: String,
     required: [true, "Provide your password"],
-    min: 6,
+    minlength: 8,
     select: false
   },
-  profile_picture: {
+  passwordConfirm: {
     type: String,
-    default: '',
+    required: [true, 'Please confirm password'],
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: "Password are not the same"
+    }
+  },
+  photo: {
+    type: String,
+    default: ""
   },
 
-  isAdmin: {
-    type: Boolean,
-    default: false,
-  }
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  },
+  dob: {
+    type: Date,
+    required: [true, "Please input your date of birth"]
+  },
+  // passwordResetToken: String,
+  // passwordResetExpires: Date,
 
 },
-  { timestamps: true }
+
+  {
+
+    timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true },
+  }
 );
 
 
+UserSchema.virtual('posts', {
+  ref: "Post",
+  foreignField: 'userId',
+  localField: '_id'
+
+})
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt)
+  this.passwordConfirm = undefined
   next();
 })
-
 UserSchema.methods.correctPassword = async function (candidatePassword, userPassword) {
   try {
     return await bcrypt.compare(candidatePassword, userPassword)
@@ -52,5 +82,14 @@ UserSchema.methods.correctPassword = async function (candidatePassword, userPass
   }
 
 }
+// UserSchema.methods.createPasswordResetToken = function () {
+//   const resetToken = crypto.randomBytes(32).toString('hex');
+
+//   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+//   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+//   console.log(resetToken);
+//   return resetToken
+// }
 
 module.exports = mongoose.model('User', UserSchema)

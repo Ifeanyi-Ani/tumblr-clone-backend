@@ -5,27 +5,20 @@ const AppErr = require("../utils/appErr");
 
 exports.updateUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const ID = id * 1;
-  if (ID === req.body.userID || req.body.isAdmin) {
-    if (req.body.password) {
-
-      const salt = await bcrypt.genSalt(10);
-      req.body.password = await bcrypt.hash(req.body.password, salt)
-
-
-
-    }
-
-    const user = await User.findByIdAndUpdate(id, {
-      $set: req.body,
-    });
-
-    res.status(200).json("Account has been updated")
-
-
-  } else {
-    return res.status(403).json("You can update only your account")
+  console.log(id, (id * 1));
+  const user = await User.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true
+  })
+  if (!user) {
+    return next(new AppErr('No user found with that ID', 404))
   }
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: user
+    }
+  })
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
@@ -34,7 +27,9 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   if (id === req.body.userID || req.body.isAdmin) {
 
     const user = await User.findByIdAndDelete(id)
-
+    if (!user) {
+      return next(new AppErr('No user found with that ID', 404))
+    }
     res.status(200).json("Account has been deleted successfully")
 
 
@@ -46,14 +41,14 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 exports.getUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
-  const user = await User.findById(id);
+  const user = await User.findById(id).populate("posts");
 
   if (!user) {
     return next(new AppErr('No user found with that ID', 404))
   }
 
-  const { password, updatedAt, createdAt, ...other } = user._doc;
-  res.status(200).json(other);
+  // const { password, updatedAt, createdAt, ...other } = user._doc;
+  res.status(200).json(user);
 
 
 
@@ -89,3 +84,27 @@ exports.followers = catchAsync(async (req, res) => {
     res.status(403).json("you can't follow yourself")
   }
 })
+
+
+// const filterObj = (obj, ...allowedFields) => {
+//   const newObj = {}
+//   Object.keys(obj).forEach(el => {
+//     if (allowedFields.includes(el)) newObj[el] = obj[el]
+//   })
+// }
+// exports.updateMe = catchAsync(async (req, res, next) => {
+//   if (req.body.password || req.body.passwordConfirm) {
+//     return next(new AppErr('This route is not for password update. Please use /forgotPassword.', 400))
+//   }
+//   const filteredBody = filterObj(req.body, 'username', 'category', 'photo')
+//   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+//     new: true,
+//     runValidators: true
+//   })
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       user: updatedUser
+//     }
+//   })
+// })
