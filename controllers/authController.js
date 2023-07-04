@@ -10,25 +10,32 @@ const signToken = (id) => {
     expiresIn: process.env.JWT_EXPIRES
   });
 }
+const creatSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.cookie('jwt', token, {
+    expires: new Date(Date.now() + process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 100),
+    // secure: true,
+    httpOnly: true
+  })
+  user.password = undefined;
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user
+    }
+  })
+}
 exports.signup = catchAsync(async (req, res, next) => {
 
 
   // const salt = await bcrypt.genSalt(10);
   // const hashPwd = await bcrypt.hash(req.body.password, salt)
 
-  const newUser = new User(req.body)
+  const newUser = await User.create(req.body)
 
-  const token = signToken(newUser._id)
-
-  const user = await newUser.save();
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user
-    }
-  });
-
+  creatSendToken(newUser, 201, res)
 })
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -47,11 +54,7 @@ exports.login = catchAsync(async (req, res, next) => {
       msg: "Incorrect Details"
     })
   }
-  const token = signToken(user._id)
-  res.status(200).json({
-    status: "success",
-    token
-  })
+  creatSendToken(user, 200, res);
   // try {
   //   const user = await User.findOne({ email: req.body.email });
   //   !user && res.status(404).json("user not found")

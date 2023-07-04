@@ -38,6 +38,17 @@ exports.updatePost = catchAsync(async (req, res, next) => {
   })
 })
 
+exports.deletePost = catchAsync(async (req, res, next) => {
+  const post = await Post.findByIdAndDelete(req.params.id);
+  if (!post) {
+    return next(new AppErr('No post found with that ID', 404))
+  }
+  res.status(200).json({
+    status: 'success',
+    data: null
+  })
+})
+
 exports.createPost = catchAsync(async (req, res, next) => {
   const newPost = await Post.create(req.body);
   res.status(201).json({

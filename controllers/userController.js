@@ -23,19 +23,14 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
   const { id } = req.params
-  console.log(id);
-  if (id === req.body.userID || req.body.isAdmin) {
-
-    const user = await User.findByIdAndDelete(id)
-    if (!user) {
-      return next(new AppErr('No user found with that ID', 404))
-    }
-    res.status(200).json("Account has been deleted successfully")
-
-
-  } else {
-    return res.status(403).json("You can delete only your account")
+  const user = await User.findByIdAndDelete(id)
+  if (!user) {
+    return next(new AppErr('No user found with that ID', 404))
   }
+  res.status(200).json({
+    status: 'success',
+    data: null
+  })
 })
 
 exports.getUser = catchAsync(async (req, res, next) => {

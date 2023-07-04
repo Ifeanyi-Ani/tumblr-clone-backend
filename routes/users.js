@@ -10,7 +10,7 @@ const authController = require("../controllers/authController")
 router
   .route("/:id")
   .patch(userController.updateUser)
-  .delete(userController.deleteUser)
+  .delete(authController.protect, userController.deleteUser)
   .get(authController.protect, authController.restrictTo('admin'), userController.getUser)
 //get all user
 router.get("/", userController.getAllUser)

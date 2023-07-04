@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 
 const helmet = require('helmet');
 const morgan = require('morgan');
+const cors = require('cors')
 
 const globalErr = require('./controllers/errController')
 const AppErr = require('./utils/appErr')
@@ -13,8 +14,15 @@ const authRoute = require('./routes/auth')
 const postRoute = require('./routes/post')
 dotenv.config()
 
-App.use(express.json());
+
+App.use(cors());
+
+App.options('*', cors());
+
+App.use(express.static(path.join(__dirname, 'public')));
 App.use(helmet());
+App.use(express.json());
+App.use(express.urlencoded({ extended: true }));
 App.use(morgan("dev"));
 
 
