@@ -11,7 +11,7 @@ router
   .route("/:id")
   .patch(userController.updateUser)
   .delete(authController.protect, userController.deleteUser)
-  .get(authController.protect, authController.restrictTo('admin'), userController.getUser)
+  .get(authController.protect, userController.getUser)
 //get all user
 router.get("/", userController.getAllUser)
 //follow a user
