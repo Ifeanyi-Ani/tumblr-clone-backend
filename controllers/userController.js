@@ -5,7 +5,7 @@ const AppErr = require("../utils/appErr");
 
 exports.updateUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  console.log(id, (id * 1));
+  if (req.file) req.body.photo = req.file.filename
   const user = await User.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true

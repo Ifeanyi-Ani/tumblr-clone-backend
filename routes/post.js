@@ -12,7 +12,7 @@ router
 router
   .route('/')
   .get(postController.getAllPost)
-  .post(postController.createPost)
+  .post(postController.uploadPostImage, postController.createPost)
 
 
 module.exports = router

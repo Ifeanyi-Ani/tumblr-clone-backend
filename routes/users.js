@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const { json } = require('express');
+
 const userController = require("../controllers/userController");
 const authController = require("../controllers/authController")
 
@@ -9,9 +10,9 @@ const authController = require("../controllers/authController")
 //update User
 router
   .route("/:id")
-  .patch(userController.updateUser)
-  .delete(authController.protect, userController.deleteUser)
-  .get(authController.protect, userController.getUser)
+  .patch(authController.uploadUserPhoto, userController.updateUser)
+  .delete(userController.deleteUser)
+  .get(userController.getUser)
 //get all user
 router.get("/", userController.getAllUser)
 //follow a user

@@ -2,6 +2,7 @@ const express = require('express');
 const App = express();
 const path = require('path');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser')
 
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -12,10 +13,13 @@ const AppErr = require('./utils/appErr')
 const userRoute = require('./routes/users')
 const authRoute = require('./routes/auth')
 const postRoute = require('./routes/post')
+const commentRoute = require('./routes/comments')
 dotenv.config()
 
 
-App.use(cors());
+App.use(cors({
+  origin: 'http://localhost:5173'
+}))
 
 App.options('*', cors());
 
@@ -23,12 +27,13 @@ App.use(express.static(path.join(__dirname, 'public')));
 App.use(helmet());
 App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
+App.use(cookieParser())
 App.use(morgan("dev"));
 
 
 App.use((req, res, next) => {
   req.requesTime = new Date().toISOString();
-  console.log(req.headers);
+  console.log(req.cookies);
   next()
 })
 
@@ -36,6 +41,7 @@ App.use((req, res, next) => {
 App.use('/users', userRoute)
 App.use('/auth', authRoute)
 App.use('/posts', postRoute)
+App.use("/posts/:postId/comments", commentRoute)
 
 App.all('*', (req, res, next) => {
 
