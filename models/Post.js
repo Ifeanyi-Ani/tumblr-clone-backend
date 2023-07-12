@@ -12,10 +12,7 @@ const PostSchema = new mongoose.Schema({
     default: ""
   },
   category: [],
-  comments: {
-    type: Array,
-    default: []
-  },
+
   likes: [],
   createdAt: {
     type: Date,
@@ -31,9 +28,15 @@ const PostSchema = new mongoose.Schema({
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
   })
+PostSchema.virtual('comments', {
+  ref: "Comment",
+  foreignField: 'postId',
+  localField: '_id'
+
+})
 PostSchema.pre(/^find/, function (next) {
   this.populate({
-    path: "userId"
+    path: "userId",
   })
   next()
 })

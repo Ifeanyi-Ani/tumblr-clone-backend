@@ -29,7 +29,7 @@ exports.uploadPostImage = upload.single('image')
 exports.getPost = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
-  const post = await Post.findById(id);
+  const post = await Post.findById(id).populate("comments");
 
   if (!Post) {
     return next(new AppErr('No Post found with that ID', 404))

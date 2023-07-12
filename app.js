@@ -38,10 +38,10 @@ App.use((req, res, next) => {
 })
 
 
+App.use(commentRoute)
 App.use('/users', userRoute)
 App.use('/auth', authRoute)
 App.use('/posts', postRoute)
-App.use("/posts/:postId/comments", commentRoute)
 
 App.all('*', (req, res, next) => {
 
