@@ -80,7 +80,6 @@ exports.login = catchAsync(async (req, res, next) => {
     })
 
   }
-  console.log(req.headers)
   createSendToken(user, 200, req, res);
 })
 exports.logout = (req, res) => {

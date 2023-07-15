@@ -14,6 +14,7 @@ const userRoute = require('./routes/users')
 const authRoute = require('./routes/auth')
 const postRoute = require('./routes/post')
 const commentRoute = require('./routes/comments')
+const likeRoute = require("./routes/likes")
 dotenv.config()
 
 
@@ -39,6 +40,7 @@ App.use((req, res, next) => {
 
 
 App.use(commentRoute)
+App.use(likeRoute)
 App.use('/users', userRoute)
 App.use('/auth', authRoute)
 App.use('/posts', postRoute)

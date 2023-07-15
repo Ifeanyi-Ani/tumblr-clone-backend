@@ -1,6 +1,8 @@
 // Other imports...
 const User = require('../models/User')
 const Post = require('../models/Post')
+const catchAsync = require('../utils/catchAsync')
+const AppErr = require('../utils/appErr')
 // Like a post
 exports.likePost = catchAsync(async (req, res, next) => {
   const { postId } = req.params;
