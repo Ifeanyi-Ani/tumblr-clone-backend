@@ -51,7 +51,6 @@ exports.getUser = catchAsync(async (req, res, next) => {
 })
 
 exports.getAllUser = catchAsync(async (req, res, next) => {
-  console.log(User);
   const user = await User.find()
   res.status(200).json({
     status: "success",

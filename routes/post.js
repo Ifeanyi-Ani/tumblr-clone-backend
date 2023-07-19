@@ -4,7 +4,7 @@ const postController = require('../controllers/postController')
 
 router
   .route('/:id')
-  .patch(postController.updatePost)
+  .patch(postController.uploadPostImage, postController.updatePost)
   .delete(postController.deletePost)
   .get(postController.getPost)
 

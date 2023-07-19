@@ -34,7 +34,7 @@ App.use(morgan("dev"));
 
 App.use((req, res, next) => {
   req.requesTime = new Date().toISOString();
-  console.log(req.cookies);
+  // console.log(req.cookies);
   next()
 })
 
