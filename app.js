@@ -1,7 +1,6 @@
 const express = require('express');
 const App = express();
 const path = require('path');
-const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser')
 
 const helmet = require('helmet');
@@ -15,7 +14,7 @@ const authRoute = require('./routes/auth')
 const postRoute = require('./routes/post')
 const commentRoute = require('./routes/comments')
 const likeRoute = require("./routes/likes")
-dotenv.config()
+
 
 
 App.use(cors({
