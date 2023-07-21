@@ -15,11 +15,11 @@ const postRoute = require('./routes/post')
 const commentRoute = require('./routes/comments')
 const likeRoute = require("./routes/likes")
 
+App.use(cors())
 
-
-App.use(cors({
-  origin: 'http://localhost:5173'
-}))
+// App.use(cors({
+//   origin: 'http://localhost:5173'
+// }))
 
 App.options('*', cors());
 
