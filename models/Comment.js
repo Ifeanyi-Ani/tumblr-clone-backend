@@ -18,6 +18,7 @@ const CommentSchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
@@ -26,7 +27,7 @@ const CommentSchema = new mongoose.Schema(
 CommentSchema.pre(/^find/, function (next) {
   this.populate({
     path: "userId",
-    select: "username photo"
+    select: "username photo role"
   });
   next();
 });
