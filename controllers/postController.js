@@ -1,5 +1,6 @@
 const catchAsync = require('../utils/catchAsync')
 const Post = require('../models/Post');
+const Comment = require('../models/Comment')
 const AppErr = require('../utils/appErr');
 const multer = require("multer")
 
@@ -64,15 +65,20 @@ exports.updatePost = catchAsync(async (req, res, next) => {
 })
 
 exports.deletePost = catchAsync(async (req, res, next) => {
-  const post = await Post.findByIdAndDelete(req.params.id);
+  const postId = req.params.id;
+
+  await Comment.deleteMany({ postId: postId });
+
+  const post = await Post.findByIdAndDelete(postId);
   if (!post) {
-    return next(new AppErr('No post found with that ID', 404))
+    return next(new AppErr("No post found with that ID", 404));
   }
+
   res.status(200).json({
-    status: 'success',
-    data: null
-  })
-})
+    status: "success",
+    data: null,
+  });
+});
 
 exports.createPost = catchAsync(async (req, res, next) => {
   if (req.file) {
