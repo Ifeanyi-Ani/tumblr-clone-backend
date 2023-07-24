@@ -20,7 +20,7 @@ App.use(cors({
 }));
 
 
-App.options('*', cors(corsOptions));
+App.options('*', cors());
 
 
 App.use(express.static(path.join(__dirname, 'public')));
