@@ -24,7 +24,7 @@ App.use(cors())
 App.options('*', cors());
 
 App.use(express.static(path.join(__dirname, 'public')));
-App.use(helmet());
+
 App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
 App.use(cookieParser())
@@ -37,7 +37,11 @@ App.use((req, res, next) => {
   next()
 })
 
-
+App.use(
+  helmet({
+    crossOriginEmbedderPolicy: false,
+  })
+);
 App.use(commentRoute)
 App.use(likeRoute)
 App.use('/users', userRoute)
