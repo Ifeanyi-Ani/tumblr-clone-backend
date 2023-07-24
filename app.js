@@ -15,16 +15,16 @@ const postRoute = require('./routes/post')
 const commentRoute = require('./routes/comments')
 const likeRoute = require("./routes/likes")
 
-App.use(cors())
+App.use(cors({
+  origin: 'https://tumlr-ani.netlify.app'
+}));
 
-// App.use(cors({
-//   origin: 'http://localhost:5173'
-// }))
 
-App.options('*', cors());
+App.options('*', cors(corsOptions));
+
 
 App.use(express.static(path.join(__dirname, 'public')));
-
+App.use(helmet());
 App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
 App.use(cookieParser())
@@ -37,11 +37,7 @@ App.use((req, res, next) => {
   next()
 })
 
-App.use(
-  helmet({
-    crossOriginEmbedderPolicy: false,
-  })
-);
+
 App.use(commentRoute)
 App.use(likeRoute)
 App.use('/users', userRoute)
