@@ -22,11 +22,16 @@ exports.likePost = catchAsync(async (req, res, next) => {
 
   // Check if the user has already liked the post
   const alreadyLiked = post.likes.some(like => like.user.toString() === userId);
+
+  const likedIndex = post.likes.findIndex(like => like.user.toString() === userId)
   if (alreadyLiked) {
-    return next(new AppErr('You have already liked this post', 400));
+    post.likes.splice(likedIndex, 1);
+  } else {
+
+
+    post.likes.push({ user: userId });
   }
 
-  post.likes.push({ user: userId });
   await post.save();
 
   res.status(200).json({

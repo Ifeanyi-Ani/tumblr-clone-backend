@@ -7,28 +7,28 @@ const catchAsync = require('../utils/catchAsync')
 const AppErr = require("../utils/appErr");
 const cookie = require('cookie');
 
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/img/users');
-  },
-  filename: (req, file, cb) => {
-    const ext = file.mimetype.split('/')[1];
-    cb(null, `user-${Math.random() * 20000}-${Date.now()}.${ext}`);
-  }
-});
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'public/img/users');
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split('/')[1];
+//     cb(null, `user-${Math.random() * 20000}-${Date.now()}.${ext}`);
+//   }
+// });
 
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true)
-  } else {
-    cb(new AppErr("Not an image Please upload only images"), false)
-  }
-}
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter
-});
-exports.uploadUserPhoto = upload.single('photo')
+// const multerFilter = (req, file, cb) => {
+//   if (file.mimetype.startsWith('image')) {
+//     cb(null, true)
+//   } else {
+//     cb(new AppErr("Not an image Please upload only images"), false)
+//   }
+// }
+// const upload = multer({
+//   storage: multerStorage,
+//   fileFilter: multerFilter
+// });
+// exports.uploadUserPhoto = upload.single('photo')
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN

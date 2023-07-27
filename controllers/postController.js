@@ -2,29 +2,36 @@ const catchAsync = require('../utils/catchAsync')
 const Post = require('../models/Post');
 const Comment = require('../models/Comment')
 const AppErr = require('../utils/appErr');
+const { initializeApp } = require('firebase/app')
+const { getStorage, ref, getDownloadURL, uploadBytesResumable } = require('firebase/storage')
 const multer = require("multer")
+const config = require('../firebase.config')
 
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/img/posts');
-  },
-  filename: (req, file, cb) => {
-    const ext = file.mimetype.split('/')[1];
-    cb(null, `post-${Math.random() * 20000}-${Date.now()}.${ext}`);
-  }
-});
+initializeApp(config.firebaseConfig)
 
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true)
-  } else {
-    cb(new AppErr("Not an image Please upload only images"), false)
-  }
-}
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter
-});
+const storage = getStorage()
+const upload = multer({ storage: multer.memoryStorage() })
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'public/img/posts');
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split('/')[1];
+//     cb(null, `post-${Math.random() * 20000}-${Date.now()}.${ext}`);
+//   }
+// });
+
+// const multerFilter = (req, file, cb) => {
+//   if (file.mimetype.startsWith('image')) {
+//     cb(null, true)
+//   } else {
+//     cb(new AppErr("Not an image Please upload only images"), false)
+//   }
+// }
+// const upload = multer({
+//   storage: multerStorage,
+//   fileFilter: multerFilter
+// });
 exports.uploadPostImage = upload.single('image')
 
 exports.getPost = catchAsync(async (req, res, next) => {
@@ -81,8 +88,15 @@ exports.deletePost = catchAsync(async (req, res, next) => {
 });
 
 exports.createPost = catchAsync(async (req, res, next) => {
-  if (req.file) {
-    req.body.image = req.file.filename;
+  // if (req.file) {
+  //   req.body.image = req.file.filename;
+  // }
+  const storageRef = ref(storage, `posts/${req.file.originalname}  ${Math.random() * 20000}`)
+  const metadata = req.file.mimtype
+  const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata)
+  const downloadUrl = await getDownloadURL(snapshot.ref);
+  if (downloadUrl) {
+    req.body.image = downloadUrl
   }
   const newPost = await Post.create(req.body);
   res.status(201).json({

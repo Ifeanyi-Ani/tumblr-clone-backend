@@ -3,14 +3,14 @@ const router = express.Router();
 const { json } = require('express');
 
 const userController = require("../controllers/userController");
-const authController = require("../controllers/authController")
+// const authController = require("../controllers/authController")
 
 
 // router.patch('/updateMe', authController.protect, userController.updateMe)
 //update User
 router
   .route("/:id")
-  .patch(authController.uploadUserPhoto, userController.updateUser)
+  .patch(userController.uploadUserPhoto, userController.updateUser)
   .delete(userController.deleteUser)
   .get(userController.getUser)
 //get all user

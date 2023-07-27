@@ -2,6 +2,7 @@ const express = require('express');
 const App = express();
 const path = require('path');
 const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
 
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -14,10 +15,10 @@ const authRoute = require('./routes/auth')
 const postRoute = require('./routes/post')
 const commentRoute = require('./routes/comments')
 const likeRoute = require("./routes/likes")
-
-App.use(cors({
-  origin: 'https://tumlr-ani.netlify.app'
-}));
+App.use(cors())
+// App.use(cors({
+//   origin: 'https://tumlr-ani.netlify.app'
+// }));
 
 
 App.options('*', cors());
@@ -25,6 +26,7 @@ App.options('*', cors());
 
 App.use(express.static(path.join(__dirname, 'public')));
 App.use(helmet());
+App.use(bodyParser.json())
 App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
 App.use(cookieParser())

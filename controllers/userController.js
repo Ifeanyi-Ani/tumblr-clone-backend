@@ -4,11 +4,27 @@ const Comment = require("../models/Comment")
 const bcrypt = require("bcrypt");
 const catchAsync = require('../utils/catchAsync');
 const AppErr = require("../utils/appErr");
+const { initializeApp } = require('firebase/app')
+const { getStorage, ref, getDownloadURL, uploadBytesResumable } = require('firebase/storage')
+const multer = require("multer")
+const config = require('../firebase.config')
 
+initializeApp(config.firebaseConfig)
 
+const storage = getStorage()
+const upload = multer({ storage: multer.memoryStorage() })
+
+exports.uploadUserPhoto = upload.single('photo')
 exports.updateUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  if (req.file) req.body.photo = req.file.filename
+  // if (req.file) req.body.photo = req.file.filename
+  const storageRef = ref(storage, `users/${req.file.originalname}  ${Math.random() * 20000}`)
+  const metadata = req.file.mimtype
+  const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata)
+  const downloadUrl = await getDownloadURL(snapshot.ref);
+  if (downloadUrl) {
+    req.body.photo = downloadUrl
+  }
   const user = await User.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true
