@@ -55,7 +55,13 @@ exports.getPost = catchAsync(async (req, res, next) => {
 
 exports.updatePost = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  if (req.file) req.body.image = req.file.filename
+  const storageRef = ref(storage, `posts/${req.file.originalname}  ${Math.random() * 20000}`)
+  const metadata = req.file.mimtype
+  const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata)
+  const downloadUrl = await getDownloadURL(snapshot.ref);
+  if (downloadUrl) {
+    req.body.image = downloadUrl
+  }
   const post = await Post.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true
