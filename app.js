@@ -15,10 +15,10 @@ const authRoute = require('./routes/auth')
 const postRoute = require('./routes/post')
 const commentRoute = require('./routes/comments')
 const likeRoute = require("./routes/likes")
-App.use(cors())
-// App.use(cors({
-//   origin: 'https://tumlr-ani.netlify.app'
-// }));
+// App.use(cors())
+App.use(cors({
+  origin: 'https://tumlr-ani.netlify.app'
+}));
 
 
 App.options('*', cors());
