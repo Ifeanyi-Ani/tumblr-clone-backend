@@ -162,7 +162,3 @@ requests. Your contributions are appreciated!
 This project is licensed under the [ISC License](LICENSE).
 
 ---
-
-Feel free to customize this README with more specific instructions, API details,
-and any other relevant information about your project. Good luck with your
-Node.js, Express, and Mongoose backend!
