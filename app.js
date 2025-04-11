@@ -22,8 +22,8 @@ const commentRoute = require("./routes/comments");
 const likeRoute = require("./routes/likes");
 
 App.use(helmet());
-App.use(credentials);
 App.use(cors(corsOption));
+App.use(credentials);
 
 App.use(express.static(path.join(__dirname, "public")));
 App.use(bodyParser.json());
