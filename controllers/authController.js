@@ -31,7 +31,7 @@ const cookie = require("cookie");
 // exports.uploadUserPhoto = upload.single('photo')
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_COOKIE_EXPIRES_IN,
+    expiresIn: parseInt(process.env.JWT_COOKIE_EXPIRES_IN) * 1000 * 60 * 60,
   });
 };
 
@@ -89,8 +89,8 @@ exports.logout = (req, res) => {
 };
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
-  if (req.cookies.jwt) {
-    token = req.cookies;
+  if (req?.cookies?.jwt) {
+    token = req.cookies.jwt;
   } else if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -105,8 +105,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 2) Verification token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-  console.log({ decoded });
 
   // 3) Check if user still exists
   const currentUser = await User.findById(decoded.id);
@@ -143,4 +141,3 @@ exports.restrictTo = (...roles) => {
 // exports.resetPassword = catchAsync(async (req, res, next) => {
 
 // })
-

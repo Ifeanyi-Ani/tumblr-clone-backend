@@ -109,21 +109,24 @@ exports.createPost = catchAsync(async (req, res, next) => {
   // if (req.file) {
   //   req.body.image = req.file.filename;
   // }
-  const storageRef = ref(
-    storage,
-    `posts/${req.file.originalname}  ${Math.random() * 20000}`,
-  );
-  const metadata = req.file.mimtype;
-  const snapshot = await uploadBytesResumable(
-    storageRef,
-    req.file.buffer,
-    metadata,
-  );
-  const downloadUrl = await getDownloadURL(snapshot.ref);
-  if (downloadUrl) {
+  if (req.file) {
+    const storageRef = ref(
+      storage,
+      `posts/${req.file.originalname}  ${Math.random() * 20000}`,
+    );
+    console.log({ storageRef });
+    const metadata = req.file.mimtype;
+    const snapshot = await uploadBytesResumable(
+      storageRef,
+      req.file.buffer,
+      metadata,
+    );
+    console.log({ snapshot });
+    const downloadUrl = await getDownloadURL(snapshot.ref);
     req.body.image = downloadUrl;
   }
-  const newPost = await Post.create(req.body);
+
+  const newPost = await Post.create({ ...req.body, userId: req?.user?._id });
   res.status(201).json({
     status: "success",
     data: {
@@ -142,4 +145,3 @@ exports.getAllPost = catchAsync(async (req, res, next) => {
     },
   });
 });
-
